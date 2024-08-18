@@ -9,9 +9,7 @@ REDIS_DB = 0
 CSV_FILE_PATH = 'diabetes_db.csv'
 
 def load():
-    """
-    Load data from a CSV file into Redis, grouping by patient_id.
-    """
+    #Load data from a CSV file into Redis, grouping by patient_id.
     try:
         # Create a Redis connection
         r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
@@ -92,16 +90,18 @@ def get_diabetes_statistics():
 
         diabetes_count = 0
         
+        # Iterate over all patient keys retrieved from Redis
         for key in keys:
             patient_data = r.hgetall(key)
-
+            # Iterate over all records for the current patient
             for record in patient_data.values():
                 record_dict = convert_record_to_dict(record)
                 if record_dict.get('has_diabetes') == '1':
+                    # Increment the diabetes count and exit the loop for this patient
                     diabetes_count += 1
                     break
         
-        # Calculate the diabetes ratio
+        # Calculate the diabetes probability 
         return diabetes_count / patients_num
 
     except Exception as e:
